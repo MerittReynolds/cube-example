@@ -1,0 +1,117 @@
+% Under Creative Commons Attribution licence 3.0
+% (http://creativecommons.org/licences/by/3.0)
+% Author: Florian Lesaint
+\documentclass[landscape]{article}
+\usepackage{tikz}
+\usepackage{xifthen}
+%%%<
+\usepackage{verbatim}
+\usepackage[active,tightpage]{preview}
+\PreviewEnvironment{tikzpicture}
+\setlength\PreviewBorder{10pt}%
+%%%>
+\begin{comment}
+:Title: Cuboid in a 2 vanishing points perspective
+:Tags: 3D;Geometry;Mathematics
+:Author: Florian Lesaint
+:Slug: cuboid
+
+This code draws a cuboid using a 2 vanishing points perspective.
+Within the code, parameters can be revised to tune the drawing.
+\end{comment}
+\usetikzlibrary{calc}
+\begin{document}
+
+% \cube{k}{s}   with sweep s
+% \cube{k}{}    for a 0-form
+\newcommand\cube[2]{\ifthenelse{\isempty{#2}}{[#1]}{[#1{:}#2]}}
+
+\begin{tikzpicture}
+	%%% Edit the following coordinate to change the shape of your
+	%%% cuboid
+      
+	%% Vanishing points for perspective handling
+	\coordinate (P1) at (-7cm,1.5cm); % left vanishing point (To pick)
+	\coordinate (P2) at (8cm,1.5cm); % right vanishing point (To pick)
+
+	%% (A001) and (A000) defines the 2 central points of the cuboid
+	\coordinate (A001) at (0em,0cm); % central top point (To pick)
+	\coordinate (A000) at (0em,-3cm); % central bottom point (To pick)
+
+	%% (A010) to (A101) are computed given a unique parameter (or 2) .8
+	% You can vary .8 from 0 to 1 to change perspective on left side
+	\coordinate (A010) at ($(P1)!.8!(A000)$); % To pick for perspective 
+	\coordinate (A011) at ($(P1)!.8!(A001)$);
+
+	% You can vary .8 from 0 to 1 to change perspective on right side
+	\coordinate (A100) at ($(P2)!.7!(A000)$);
+	\coordinate (A101) at ($(P2)!.7!(A001)$);
+
+	%% Automatically compute the last 2 points with intersections
+	\coordinate (A111) at
+	  (intersection cs: first line={(A101) -- (P1)},
+			    second line={(A011) -- (P2)});
+	\coordinate (A110) at
+	  (intersection cs: first line={(A100) -- (P1)}, 
+			    second line={(A010) -- (P2)});
+
+	%%% Depending of what you want to display, you can comment/edit
+	%%% the following lines
+
+	%% Possibly draw back faces
+
+	\fill[gray!90] (A000) -- (A010) -- (A110) -- (A100) -- cycle; % face 6
+	\node at (barycentric cs:A000=1,A010=1,A110=1,A100=1) {\tiny $\cube{000}{xy}$};
+	
+	\fill[red!50] (A010) -- (A011) -- (A111) -- (A110) -- cycle; % face 3
+	\node at (barycentric cs:A010=1,A011=1,A111=1,A110=1) {\tiny $\cube{010}{xz}$};
+	
+	\fill[gray!30] (A111) -- (A110) -- (A100) -- (A101) -- cycle; % face 4
+	\node at (barycentric cs:A111=1,A110=1,A100=1,A101=1) {\tiny $\cube{100}{yz}$};
+	
+	\draw[thin] (A111) -- (A110);
+	\draw[thin] (A010) -- (A110);
+	\draw[thin] (A100) -- (A110);
+	
+	\node at (barycentric cs:A000=2,A100=1) {\tiny $\cube{000}{x}$};
+	\node at (barycentric cs:A000=2,A010=1) {\tiny $\cube{000}{y}$};
+	\node at (barycentric cs:A000=1,A001=2) {\tiny $\cube{000}{z}$};
+
+	%% Possibly draw front faces
+
+	% \fill[orange] (A001) -- (A101) -- (A100) -- (A000) -- cycle; % face 1
+	% \node at (barycentric cs:A1=1,A101=1,A100=1,A000=1) {\tiny f1};
+	\fill[gray!50,opacity=0.2] (A001) -- (A000) -- (A010) -- (A011) -- cycle; % f2
+	\node at (barycentric cs:A001=1,A000=1,A010=1,A011=1) {\tiny $\cube{000}{yz}$};
+	\fill[gray!90,opacity=0.2] (A001) -- (A011) -- (A111) -- (A101) -- cycle; % f5
+	\node at (barycentric cs:A001=2,A011=1,A111=1,A101=1) {\tiny $\cube{001}{xy}$};
+
+	%% Possibly draw front lines
+	\draw[thick] (A001) -- (A000);
+	\draw[thick] (A010) -- (A011);
+	\draw[thick] (A100) -- (A101);
+	\draw[thick] (A001) -- (A011);
+	\draw[thick] (A001) -- (A101);
+	\draw[thick] (A000) -- (A010);
+	\draw[thick] (A000) -- (A100);
+	\draw[thick] (A011) -- (A111);
+	\draw[thick] (A101) -- (A111);
+	
+	\draw[fill=black] (A110) circle (0.15em) 
+		node [below] {\tiny $\cube{110}{}$};
+	\draw[fill=black] (A111) circle (0.15em) 
+		node [above] {\tiny $\cube{111}{}$};
+	\draw[fill=black] (A000) circle (0.15em) 
+		node [below] {\tiny $\cube{000}{}$};
+	\draw[fill=black] (A100) circle (0.15em) 
+		node [ right] {\tiny $\cube{100}{}$};
+	\draw[fill=black] (A101) circle (0.15em) 
+		node [ right] {\tiny $\cube{101}{}$};
+	\draw[fill=black] (A010) circle (0.15em) 
+		node [ left] {\tiny $\cube{010}{}$};
+	\draw[fill=black] (A011) circle (0.15em) 
+		node [ left] {\tiny $\cube{011}{}$};
+	% \draw[fill=black] (P1) circle (0.1em) node[below] {\tiny p1};
+	% \draw[fill=black] (P2) circle (0.1em) node[below] {\tiny p2};
+\end{tikzpicture}
+\end{document} 
